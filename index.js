@@ -42,7 +42,6 @@ function getBills(start, end) {
             if (err) {
                 return console.log(err);
             }
-            // console.log(someNewIntervals);
             callSubintervals(someNewIntervals, function() {
                 return console.log({ tries: globalTries, bills: globalBills })
             })
@@ -78,7 +77,7 @@ function countBills(interval, callback) {
         }
         if (isBig(response.body)) {
             var y = createSubintervals(interval[0], interval[1], 'weeks');
-            someNewIntervals.push(y[0]);
+            someNewIntervals = someNewIntervals.concat(y);
         }
         callback();
     })
@@ -148,8 +147,8 @@ function callService(start, end, callback) {
     console.log('calling', start, end);
     globalTries++;
     request(`http://34.209.24.195/facturas?id=${id}&start=${start}&finish=${end}`, function (error, response, body) {
-        if (Number.isInteger(parseInt(body.response))) {
-            globalBills = globalBills + body.response;
+        if (Number.isInteger(parseInt(response.body))) {
+            globalBills = globalBills + parseInt(response.body);
         }
         return callback(error, response);
     });
