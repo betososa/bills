@@ -16,7 +16,7 @@ var api = 'add api url here',
     someNewIntervals = [];
 
 // global counters to return
-var unitCounter = 0,
+var globalBills = 0,
     globalTries = 0;
 
 
@@ -42,12 +42,21 @@ function getBills(start, end) {
             if (err) {
                 return console.log(err);
             }
-            return console.log('999999999999999')
+            // console.log(someNewIntervals);
+            callSubintervals(someNewIntervals, function() {
+                return console.log({ tries: globalTries, bills: globalBills })
+            })
         });
     } else {
       return { tries: globalTries, bills: response }
     }
   })
+}
+
+function callSubintervals(ints, callback) {
+    doSomething(ints, function() {
+        callback();
+    })
 }
 
 // know if we need to split intervals again
@@ -56,7 +65,7 @@ function isBig(message) {
 }
 
 function doSomething(collection, cb) {
-    async.eachSeries(collection, countBills, function(err) {
+    async.each(collection, countBills, function(err) {
         return cb();
     });
 }
@@ -67,13 +76,9 @@ function countBills(interval, callback) {
         if (err) {
             return callback(err);
         }
-        console.log(response.body);
         if (isBig(response.body)) {
             var y = createSubintervals(interval[0], interval[1], 'weeks');
-            doSomething(y, function() {
-                console.log('=0')
-                // return callback();
-            })
+            someNewIntervals.push(y[0]);
         }
         callback();
     })
@@ -84,9 +89,31 @@ function createSubintervals(start, end, unit) {
     let ints = makeIntervals(start, end, unit);
     let collection = toPairs(ints);
     completeInterval(collection, end);
+    collection = collection.concat(addLostIntervals(collection));
     return collection;
 }
 
+function addLostIntervals(intervals) {
+    var lostIntervals = []
+    for (var i = 0; i <= intervals.length -2; i++) {
+        var diff = findDateDiff(intervals[i][1], intervals[i+1][0]);
+        if (diff) {
+            lostIntervals.push(findMissingInterval(intervals[i][1], diff));
+        }
+    }
+    return lostIntervals;
+}
+
+function findDateDiff(a, b) {
+    return moment(b).diff(moment(a), 'days');
+}
+
+function findMissingInterval(a, b) {
+    var interval = [];
+    interval.push(moment(a).add(1, 'days').format('YYYY-MM-DD'));
+    interval.push(moment(a).add(b - 1, 'days').format('YYYY-MM-DD'));
+    return interval;
+}
 
 // sometimes our interval need some logic to contain all values, or the last set will be incomplete
 function completeInterval(x, end) {
@@ -121,9 +148,11 @@ function callService(start, end, callback) {
     console.log('calling', start, end);
     globalTries++;
     request(`http://34.209.24.195/facturas?id=${id}&start=${start}&finish=${end}`, function (error, response, body) {
+        if (Number.isInteger(parseInt(body.response))) {
+            globalBills = globalBills + body.response;
+        }
         return callback(error, response);
     });
 }
 
-console.log('x')
 getBills(start, end);
