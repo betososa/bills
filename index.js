@@ -3,7 +3,8 @@ var Moment = require('moment'),
     MomentRange = require('moment-range'),
     request = require('request'),
     async = require('async'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    inquirer = require('inquirer');
 
 var moment = MomentRange.extendMoment(Moment);
 
@@ -17,6 +18,34 @@ var start = moment('2017-1-1', 'YYYY-MM-DD').format('YYYY-MM-DD'),
 var globalBills = 0,
     globalTries = 0;
 
+
+// read input from user
+var prompt = [
+    {
+        type: 'input',
+        name: 'start',
+        message: 'From: ',
+        default: '2017-01-01',
+        validate: function(value) {
+            if (moment(value, 'YYYY-MM-DD').isValid()) {
+                return true;
+            }
+            return 'Please enter a valid date';
+        }
+    },
+    {
+        type: 'input',
+        name: 'end',
+        message: 'To: ',
+        default: '2017-12-31',
+        validate: function(value) {
+            if (moment(value, 'YYYY-MM-DD').isValid()) {
+                return true;
+            }
+            return 'Please enter a valid date';
+        }
+    }
+];
 
 // this function will generate intervals of `units` from our start date to end date
 // units is one [ months, weeks, days ]
@@ -152,7 +181,11 @@ function callService(start, end, callback) {
     });
 }
 
-// getBills(start, end);
+inquirer.prompt(prompt).then(function(answers) {
+    var startDate = moment(answers.start, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        endDate = moment(answers.end, 'YYYY-MM-DD').format('YYYY-MM-DD');
+        getBills(startDate, endDate);
+})
 
 
 module.exports = {
