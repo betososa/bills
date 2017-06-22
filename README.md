@@ -31,6 +31,6 @@ yarn test
 ```
 
 Report coverage
-```
-yarn cover
+```sh
+yarn cover || npm run cover
 ```
