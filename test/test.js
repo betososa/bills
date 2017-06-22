@@ -1,6 +1,7 @@
 /*globals describe, it*/
 var assert = require('assert'),
     sinon = require('sinon'),
+    request = require('request'),
     moment = require('moment'),
     bill = require('../index');
 
@@ -20,5 +21,15 @@ describe('lib functions', function() {
             assert.deepEqual(bill.toPairs(source), target);
         });
     });
-    
+    describe('callService', function() {
+        it('should call the endpoint and run callback', function() {
+            var stubGet = sinon.stub(request, 'get'),
+                callback = sinon.spy();
+            stubGet.onCall(0).yields(null, 'response');
+            bill.callService('2017-01-01', '2017-01-02', callback);
+            stubGet.restore();
+            assert.equal(callback.calledOnce, true);
+        });
+    });
 });
+

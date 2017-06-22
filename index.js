@@ -69,23 +69,23 @@ function getBills(start, end) {
             }
             callSubintervals(someNewIntervals, function() {
                 return console.log({ tries: globalTries, bills: globalBills })
-            })
+            });
         });
     } else {
-      return { tries: globalTries, bills: response }
+      return { tries: globalTries, bills: response };
     }
-  })
+  });
 }
 
 function callSubintervals(ints, callback) {
     doSomething(ints, function() {
         callback();
-    })
+    });
 }
 
 // know if we need to split intervals again
 function isBig(message) {
-    return !!~message.indexOf('100 resultados')
+    return !!~message.indexOf('100 resultados');
 }
 
 function doSomething(collection, cb) {
@@ -108,7 +108,7 @@ function countBills(interval, callback) {
             someNewIntervals = someNewIntervals.concat(y);
         }
         callback();
-    })
+    });
 }
 
 // create intervals is response isBig
@@ -121,7 +121,7 @@ function createSubintervals(start, end, unit) {
 }
 
 function addLostIntervals(intervals) {
-    var lostIntervals = []
+    var lostIntervals = [];
     for (var i = 0; i <= intervals.length -2; i++) {
         var diff = findDateDiff(intervals[i][1], intervals[i+1][0]);
         if (diff) {
@@ -174,7 +174,7 @@ function toPairs(array) {
 function callService(start, end, callback) {
     console.log('calling', start, end);
     globalTries++;
-    request(`http://34.209.24.195/facturas?id=${id}&start=${start}&finish=${end}`, function (error, response) {
+    request.get(`http://34.209.24.195/facturas?id=${id}&start=${start}&finish=${end}`, function (error, response) {
         if (Number.isInteger(parseInt(response.body))) {
             globalBills = globalBills + parseInt(response.body);
         }
@@ -186,7 +186,7 @@ inquirer.prompt(prompt).then(function(answers) {
     var startDate = moment(answers.start, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         endDate = moment(answers.end, 'YYYY-MM-DD').format('YYYY-MM-DD');
         getBills(startDate, endDate);
-})
+});
 
 
 module.exports = {
@@ -198,5 +198,6 @@ module.exports = {
     createSubintervals: createSubintervals,
     isBig: isBig,
     doSomething: doSomething,
-    getInterval: getInterval
-}
+    getInterval: getInterval,
+    callService: callService
+};
