@@ -9,9 +9,7 @@ var Moment = require('moment'),
 var moment = MomentRange.extendMoment(Moment);
 
 // declare vars that will be in the scope of our functions
-var start = moment('2017-1-1', 'YYYY-MM-DD').format('YYYY-MM-DD'),
-    end   = moment('2017-12-31', 'YYYY-MM-DD').format('YYYY-MM-DD'),
-    id = '717f076e-e13c-45b4-bcc4-51c229e1b326',
+var id = '717f076e-e13c-45b4-bcc4-51c229e1b326',
     someNewIntervals = [];
 
 // global counters to return
@@ -92,6 +90,9 @@ function isBig(message) {
 
 function doSomething(collection, cb) {
     async.each(collection, countBills, function(err) {
+        if (err) {
+            return cb(err);
+        }
         return cb();
     });
 }
@@ -173,7 +174,7 @@ function toPairs(array) {
 function callService(start, end, callback) {
     console.log('calling', start, end);
     globalTries++;
-    request(`http://34.209.24.195/facturas?id=${id}&start=${start}&finish=${end}`, function (error, response, body) {
+    request(`http://34.209.24.195/facturas?id=${id}&start=${start}&finish=${end}`, function (error, response) {
         if (Number.isInteger(parseInt(response.body))) {
             globalBills = globalBills + parseInt(response.body);
         }

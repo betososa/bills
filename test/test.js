@@ -17,7 +17,7 @@ describe('lib functions', function() {
         it('should create arrays of 2 elements', function() {
             var source = [1, 2, 3, 4],
                 target = [[1, 2], [3, 4]];
-            assert.deepEqual(bill.toPairs(source), target)
+            assert.deepEqual(bill.toPairs(source), target);
         });
     });
     
