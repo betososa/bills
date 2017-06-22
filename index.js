@@ -5,14 +5,12 @@ var Moment = require('moment'),
     async = require('async'),
     _ = require('lodash');
 
-const moment = MomentRange.extendMoment(Moment);
+var moment = MomentRange.extendMoment(Moment);
 
 // declare vars that will be in the scope of our functions
-var api = 'add api url here',
-    start = moment('2017-1-1', 'YYYY-MM-DD').format('YYYY-MM-DD'),
+var start = moment('2017-1-1', 'YYYY-MM-DD').format('YYYY-MM-DD'),
     end   = moment('2017-12-31', 'YYYY-MM-DD').format('YYYY-MM-DD'),
     id = '717f076e-e13c-45b4-bcc4-51c229e1b326',
-    range = moment.range(start, end),
     someNewIntervals = [];
 
 // global counters to return
@@ -85,8 +83,8 @@ function countBills(interval, callback) {
 
 // create intervals is response isBig
 function createSubintervals(start, end, unit) {
-    let ints = makeIntervals(start, end, unit);
-    let collection = toPairs(ints);
+    var ints = makeIntervals(start, end, unit);
+    var collection = toPairs(ints);
     completeInterval(collection, end);
     collection = collection.concat(addLostIntervals(collection));
     return collection;
@@ -116,12 +114,12 @@ function findMissingInterval(a, b) {
 
 // sometimes our interval need some logic to contain all values, or the last set will be incomplete
 function completeInterval(x, end) {
-    let lastElement = x[x.length - 1];
+    var lastElement = x[x.length - 1];
     if (typeof lastElement[1] === 'undefined') {
         lastElement.push(moment(end).format('YYYY-MM-DD'));
     }
     if (lastElement[1] !== end) {
-        let lastSet = [];
+        var lastSet = [];
         lastSet.push(moment(lastElement[1]).add(1, 'day').format('YYYY-MM-DD'));
         lastSet.push(moment(end).format('YYYY-MM-DD'));
         x.push(lastSet);
@@ -130,7 +128,7 @@ function completeInterval(x, end) {
 
 // call moment function to split
 function makeIntervals(start, end, unit) {
-    let r = moment.range(start, end);
+    var r = moment.range(start, end);
     return getInterval(unit, r);
 }
 
@@ -154,4 +152,17 @@ function callService(start, end, callback) {
     });
 }
 
-getBills(start, end);
+// getBills(start, end);
+
+
+module.exports = {
+    toPairs: toPairs,
+    makeIntervals: makeIntervals,
+    completeInterval: completeInterval,
+    findMissingInterval: findMissingInterval,
+    findDateDiff: findDateDiff,
+    createSubintervals: createSubintervals,
+    isBig: isBig,
+    doSomething: doSomething,
+    getInterval: getInterval
+}
